@@ -64,13 +64,76 @@ this.$http.get('api/4/news/latest').then(response => {
 给 router 设置一个 name ，然后跳转 ```<router-link v-bind:to="{ name: name ,params:{ id:id }}"></router-link>``` 这种方式  
 这样链接就不会错了
 
-##### vue-router 同路径跳转不刷新页面
+##### vue-router 同路径跳转不刷新页面  
 
-*明天更新例子！*
+当使用路由参数时，例如从 「 /theme/12 」 导航到 「 theme/13」，原来的组件实例会被复用。因为两个路由都渲染同个组件，比起销毁再创建，复用则显得更加高效。不过，这也意味着*组件的生命周期钩子不会再被调用*。  
+如果想刷新页面，可以用 watch 监听 $route 对象：  
 
-##### 时间格式化
+```js
+export default {
+    created() {
+        this.getDate()
+    },
+    methods: {
+        getDate() {
+            <!--  -->
+        }
+    },
+    watch: {
+        '$route': function() {
+            <!--  -->
+            this.getDate()  //重新获取数据
+        }
+    }
+}
+```
 
-##### 父子组件通信
+参考文档 [动态路由匹配](https://router.vuejs.org/zh-cn/essentials/dynamic-matching.html)
+
+##### 时间格式化  
+
+Json 获取时间格式是一串 10 位数的数字，是从 1970 年 1 月 1 日至今的毫秒数。但 js 时间戳是 13 位数的，需要做一下转换。在全局定义一个函数  
+
+```js
+Vue.prototype.jsonDate = function() {
+    <!--  -->
+}
+```
+
+然后在需要用的地方加上 jsonDate(getDate)  
+
+具体代码参考 [JS 格式化日期函数](http://idmrchan.com/2017/04/27/json-data-formate/)
+
+##### 父子组件通信  
+
+在组件中，子组件需要获取父组件数据，父组件使用 v-bind 动态绑定数据，子组件使用 prop 获取：  
+
+父
+```js
+<child :date="date"><\/child>
+```
+
+子
+```js
+props: {
+    date: {
+        type: String,
+        defalut: '',    //可以指定默认值
+    }
+}
+```
+
+prop 是单向数据流，若要双向绑定就比较复杂了，我搞了半天，写了个笔记。[文章](http://idmrchan.com/2017/04/27/vue-custom-prop/)  
+
+### 总结
+
+除了以上其他还有一些移动端的坑，鼠标事件与触摸屏事件的区别，还有在手机上使用 fixed 与电脑的区别等问题，写到后面我觉得不能一味的按照 App 的模式来写，有些该适当做些改变。  
+
+性能上，在 Chrome 上使用 F12 模拟手机是没有问题，手机只测试了 iPhone 感觉性能不是太好，在切换的时候可能是网速的问题，会有卡顿。估计是我移动端写的少的原因，导致组件加载过大，或是在浏览器上不能一味模仿 App。  
+
+功能上，侧重实现组件间的切换功能，还有获取文章等信息，有些如分享、夜间模式等写的多了，不想在写了，有时间在补上。  
+
+总之，移动端性能和桌面端不能比的。在这一方面还需要多多学习
 
 ### 使用
 
